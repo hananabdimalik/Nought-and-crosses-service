@@ -9,3 +9,6 @@ enum class GamePieces {
 
 @Serializable
 data class GameCell(val piece: GamePieces, val position: Int)
+
+@Serializable
+enum class GameState{Win, Draw, None}

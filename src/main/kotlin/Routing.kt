@@ -18,5 +18,10 @@ fun Application.configureRouting() {
             val updatedBoard = repo.updateGameBoard(position)
             call.respond(HttpStatusCode.OK, updatedBoard)
         }
+
+        get("/gameState") {
+            val gameState = repo.getGameState()
+            call.respond(HttpStatusCode.OK, gameState)
+        }
     }
 }
