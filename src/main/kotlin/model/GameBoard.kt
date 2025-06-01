@@ -1,0 +1,11 @@
+package com.example.model
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class GamePieces {
+    Nought, Cross, Unplayed
+}
+
+@Serializable
+data class GameCell(val piece: GamePieces, val position: Int)
