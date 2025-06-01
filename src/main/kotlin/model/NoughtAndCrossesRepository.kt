@@ -4,9 +4,27 @@ class NoughtAndCrossesRepository {
 
     val gameBoard = MutableList(9) { GameCell(GamePieces.Unplayed, it) }
 
+    var noughtCount = 0
+    var crossCount = 0
+
+    fun alternativeGamePiece(): GamePieces {
+        return when {
+            noughtCount == crossCount -> {
+                crossCount++
+                return GamePieces.Nought
+            }
+
+            crossCount > noughtCount -> {
+                noughtCount++
+                return GamePieces.Cross
+            }
+            else -> GamePieces.Unplayed
+        }
+    }
+
     fun updateGameBoard(position: Int): List<GameCell> {
         if (position in 0 until gameBoard.size) {
-            gameBoard[position] = gameBoard[position].copy(GamePieces.Nought, position)
+            gameBoard[position] = gameBoard[position].copy(alternativeGamePiece(), position)
         }
         return gameBoard
     }
