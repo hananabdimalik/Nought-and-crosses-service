@@ -3,12 +3,19 @@ package com.example
 import com.example.model.NoughtAndCrossesRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.request.receiveText
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
     val repo = NoughtAndCrossesRepository()
     routing {
+        post ("/join"){
+            val player = call.receiveText()
+            repo.addPlayer(player)
+            call.respond(HttpStatusCode.OK, "$player joined the game")
+        }
+
         get("/gameBoard") {
             call.respond(HttpStatusCode.OK, repo.gameBoard)
         }

@@ -4,6 +4,8 @@ class NoughtAndCrossesRepository {
 
     val gameBoard = MutableList(9) { GameCell(GamePieces.Unplayed, it) }
 
+    var gameSession = GameSession()
+
     private var noughtCount = 0
     private var crossCount = 0
 
@@ -73,5 +75,13 @@ class NoughtAndCrossesRepository {
             }
         }
         return gameBoard
+    }
+
+    fun addPlayer(player: String) {
+        gameSession = gameSession.copy(players = gameSession.players.plus(player))
+
+        if (gameSession.players.size == 2) {
+            gameSession = gameSession.copy(hasGameBegan = true, gameState = GameState.None)
+        }
     }
 }
