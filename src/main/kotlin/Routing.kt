@@ -14,9 +14,13 @@ fun Application.configureRouting() {
         }
 
         get("updateBoard/{position}") {
-            val position = call.parameters["position"]?.toInt() ?: 0
-            val updatedBoard = repo.updateGameBoard(position)
-            call.respond(HttpStatusCode.OK, updatedBoard)
+            val position = call.parameters["position"]?.toInt()
+            if (position != null) {
+                val updatedBoard = repo.updateGameBoard(position)
+                call.respond(HttpStatusCode.OK, updatedBoard)
+            } else {
+                call.respond(HttpStatusCode.BadRequest, "Invalid position")
+            }
         }
 
         get("/gameState") {
