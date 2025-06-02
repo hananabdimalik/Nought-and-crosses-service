@@ -40,11 +40,11 @@ class NoughtAndCrossesRepository {
         2, 4, 6
     ).chunked(3)
 
-    fun getGameState(): GameState {
+    fun getGameState(list: List<GameCell>): GameState {
         val noughtCells = mutableListOf<Int>()
         val crossCells = mutableListOf<Int>()
 
-        gameBoard.forEachIndexed { index, cell ->
+        list.forEachIndexed { index, cell ->
             if (cell.piece == GamePieces.Nought) {
                 noughtCells.add(index)
             } else if (cell.piece == GamePieces.Cross) {
@@ -65,6 +65,8 @@ class NoughtAndCrossesRepository {
     }
 
     fun resetGame(): List<GameCell> {
+        noughtCount = 0
+        crossCount = 0
         gameBoard.forEachIndexed { index, cell ->
             if (index in 0 until gameBoard.size) {
                 gameBoard[index] = gameBoard[index].copy(piece = GamePieces.Unplayed, index)

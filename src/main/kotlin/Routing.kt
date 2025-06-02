@@ -24,7 +24,7 @@ fun Application.configureRouting() {
         }
 
         get("/gameState") {
-            val gameState = repo.getGameState()
+            val gameState = repo.getGameState(repo.gameBoard)
             call.respond(HttpStatusCode.OK, gameState)
         }
 
