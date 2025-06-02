@@ -63,4 +63,13 @@ class NoughtAndCrossesRepository {
         }
         return GameState.None
     }
+
+    fun resetGame(): List<GameCell> {
+        gameBoard.forEachIndexed { index, cell ->
+            if (index in 0 until gameBoard.size) {
+                gameBoard[index] = gameBoard[index].copy(piece = GamePieces.Unplayed, index)
+            }
+        }
+        return gameBoard
+    }
 }
