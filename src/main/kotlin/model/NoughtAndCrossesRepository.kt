@@ -25,8 +25,7 @@ class NoughtAndCrossesRepository {
     }
 
     fun updateGameBoard(position: Int): List<GameCell> {
-        gameSession = gameSession.copy(hasGameBegan = true)
-        if (position in 0 until gameBoard.size) {
+        if (gameSession.hasGameBegan && position in 0 until gameBoard.size) {
             gameBoard[position] = gameBoard[position].copy(alternativeGamePiece(), position)
         }
         return gameBoard
