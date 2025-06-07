@@ -25,6 +25,7 @@ class NoughtAndCrossesRepository {
     }
 
     fun updateGameBoard(position: Int): List<GameCell> {
+        gameSession = gameSession.copy(hasGameBegan = true)
         if (position in 0 until gameBoard.size) {
             gameBoard[position] = gameBoard[position].copy(alternativeGamePiece(), position)
         }
@@ -78,7 +79,9 @@ class NoughtAndCrossesRepository {
     }
 
     fun addPlayer(player: String) {
-        gameSession = gameSession.copy(players = gameSession.players.plus(player))
+        if (gameSession.players.size in 0 until 2) {
+            gameSession = gameSession.copy(players = gameSession.players + player)
+        }
 
         if (gameSession.players.size == 2) {
             gameSession = gameSession.copy(hasGameBegan = true, gameState = GameState.None)

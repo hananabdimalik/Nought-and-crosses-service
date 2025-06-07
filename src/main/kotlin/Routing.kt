@@ -13,7 +13,7 @@ fun Application.configureRouting() {
         post ("/join"){
             val player = call.receiveText()
             repo.addPlayer(player)
-            call.respond(HttpStatusCode.OK, "$player joined the game")
+            call.respond(HttpStatusCode.OK, repo.gameSession)
         }
 
         get("/gameBoard") {
