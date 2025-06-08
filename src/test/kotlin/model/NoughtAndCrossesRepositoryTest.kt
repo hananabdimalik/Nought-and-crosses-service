@@ -2,6 +2,7 @@ package com.example.model
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class NoughtAndCrossesRepositoryTest {
 
@@ -9,6 +10,7 @@ class NoughtAndCrossesRepositoryTest {
 
     @Test
     fun `updateGameBoard, when cell position, gameBoard is updated with GridCell containing a gamePiece at said position`() {
+        repo.gameSession = repo.gameSession.copy(hasGameBegan = true)
         repo.updateGameBoard(2)
         val expected = listOf(
             GameCell(GamePieces.Unplayed, 0),
@@ -45,5 +47,27 @@ class NoughtAndCrossesRepositoryTest {
     @Test
     fun `resetGame, when resetGame is called, gameBoard is initialised to unplayed state`() {
         assertEquals(List(9) { GameCell(GamePieces.Unplayed, it) }, repo.resetGame())
+    }
+
+    @Test
+    fun `addPlayer, when addPlayer is called with one name, gameSession player object is updated with name`() {
+        repo.addPlayer("Bob")
+        assertTrue(repo.gameSession.players.contains("Bob"))
+    }
+
+    @Test
+    fun `addPlayer, if player name is empty, players is not updated`() {
+        repo.addPlayer("")
+        assertTrue(repo.gameSession.players.isEmpty())
+    }
+
+    @Test
+    fun `addPlayer, if methods is called more than 2 times, the players list is not updated`(){
+        repo.addPlayer("Bob")
+        repo.addPlayer("Dylan")
+        assertTrue(repo.gameSession.players.size == 2)
+
+        repo.addPlayer("Mitch")
+        assertTrue(repo.gameSession.players.size == 2)
     }
 }
