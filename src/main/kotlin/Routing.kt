@@ -10,6 +10,10 @@ import io.ktor.server.routing.*
 fun Application.configureRouting() {
     val repo = NoughtAndCrossesRepository()
     routing {
+        get("/gameSession"){
+            call.respond(HttpStatusCode.OK, repo.gameSession)
+        }
+
         post ("/join"){
             val player = call.receiveText()
             repo.addPlayer(player)

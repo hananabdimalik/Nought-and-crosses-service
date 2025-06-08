@@ -67,6 +67,7 @@ class NoughtAndCrossesRepository {
     }
 
     fun resetGame(): List<GameCell> {
+        gameSession = gameSession.copy(hasGameBegan = true, gameState = GameState.None)
         noughtCount = 0
         crossCount = 0
         gameBoard.forEachIndexed { index, cell ->
@@ -78,12 +79,13 @@ class NoughtAndCrossesRepository {
     }
 
     fun addPlayer(player: String) {
-        if (gameSession.players.size in 0 until 2) {
-            gameSession = gameSession.copy(players = gameSession.players + player)
-        }
-
-        if (gameSession.players.size == 2) {
-            gameSession = gameSession.copy(hasGameBegan = true, gameState = GameState.None)
+        if (player.isNotEmpty()) {
+            if (gameSession.players.size in 0 until 2) {
+                gameSession = gameSession.copy(players = gameSession.players + player)
+            }
+            if (gameSession.players.size == 2) {
+                gameSession = gameSession.copy(hasGameBegan = true, gameState = GameState.None)
+            }
         }
     }
 }
