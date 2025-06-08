@@ -17,7 +17,8 @@ enum class GameState{Win, Draw, None}
 data class GameSession(
     val players: List<Player>? = emptyList(),
     val hasGameBegan: Boolean = false,
-    val gameState: GameState = GameState.None
+    val gameState: GameState = GameState.None,
+    val currentPlayer: Player? = null,
 )
 
 @Serializable
@@ -28,6 +29,6 @@ data class Player(
 )
 
 // reset players
-// send playerName with gamePiece when calling updatingGameBoard
-// set gamePiece for each player
-// hold the value of currentPlayer to ensure alternating
+// send playerName with gamePiece when calling updatingGameBoard -Done
+// set gamePiece for each player - Done
+// hold the value of currentPlayer to ensure alternating - Done

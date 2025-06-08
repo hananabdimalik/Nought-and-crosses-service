@@ -119,4 +119,33 @@ class NoughtAndCrossesRepositoryTest {
 
         assertEquals(1, repo.gameSession.players?.size)
     }
+
+    @Test
+    fun `getGameSession, given a winningCombo, return winning player`() {
+
+        // add player
+        val player = Player("Dylan", "id")
+        repo.addPlayer(player)
+
+        // set currentPlayer
+        repo.updateGameBoard(3, player)
+
+        val input = listOf(
+            GameCell(GamePieces.Unplayed, 0),
+            GameCell(GamePieces.Unplayed, 1),
+            GameCell(GamePieces.Nought, 2),
+            GameCell(GamePieces.Cross, 3),
+            GameCell(GamePieces.Cross, 4),
+            GameCell(GamePieces.Cross, 5),
+            GameCell(GamePieces.Nought, 6),
+            GameCell(GamePieces.Unplayed, 7),
+            GameCell(GamePieces.Unplayed, 8),
+        )
+
+        // get game state
+        val actual = repo.getGameSession(input)
+
+        assertEquals(GameState.Win, actual.gameState)
+        assertEquals(player, actual.currentPlayer)
+    }
 }

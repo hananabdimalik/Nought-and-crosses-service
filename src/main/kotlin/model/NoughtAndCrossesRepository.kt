@@ -9,7 +9,7 @@ class NoughtAndCrossesRepository {
 
     private var noughtCount = 0
     private var crossCount = 0
-    var currentPlayer = Player()
+    private var currentPlayer = Player()
 
     private fun alternativeGamePiece(): GamePieces {
         return when {
@@ -62,9 +62,9 @@ class NoughtAndCrossesRepository {
 
         winningCombo.forEach {
             if (noughtCells.containsAll(it)) {
-                return gameSession.copy(hasGameBegan = false, gameState = GameState.Win)
+                return gameSession.copy(hasGameBegan = false, gameState = GameState.Win, currentPlayer = currentPlayer)
             } else if (crossCells.containsAll(it)) {
-                return gameSession.copy(hasGameBegan = false, gameState = GameState.Win)
+                return gameSession.copy(hasGameBegan = false, gameState = GameState.Win, currentPlayer = currentPlayer)
             } else if (crossCells.size + noughtCells.size == 9 && winningCombo[winningCombo.size - 1] == it) {
                 return gameSession.copy(hasGameBegan = false, gameState = GameState.Draw)
             }
