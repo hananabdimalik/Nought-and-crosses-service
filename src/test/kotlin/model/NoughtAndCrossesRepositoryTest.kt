@@ -27,7 +27,7 @@ class NoughtAndCrossesRepositoryTest {
     }
 
     @Test
-    fun `getGameState, when theres no winningCombo in board, gameState is None`() {
+    fun `getGameSession, when theres no winningCombo in board, gameState is None`() {
 
         val input = listOf(
             GameCell(GamePieces.Unplayed, 0),
@@ -40,8 +40,8 @@ class NoughtAndCrossesRepositoryTest {
             GameCell(GamePieces.Unplayed, 7),
             GameCell(GamePieces.Unplayed, 8),
         )
-        val actual = repo.getGameState(input)
-        assertEquals(GameState.None, actual)
+        val actual = repo.getGameSession(input)
+        assertEquals(repo.gameSession.gameState, actual.gameState)
     }
 
     @Test

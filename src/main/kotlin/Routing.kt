@@ -3,7 +3,7 @@ package com.example
 import com.example.model.NoughtAndCrossesRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.request.receiveText
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
@@ -11,7 +11,8 @@ fun Application.configureRouting() {
     val repo = NoughtAndCrossesRepository()
     routing {
         get("/gameSession"){
-            call.respond(HttpStatusCode.OK, repo.gameSession)
+            val gameSession = repo.getGameSession(repo.gameBoard)
+            call.respond(HttpStatusCode.OK, gameSession)
         }
 
         post ("/join"){
@@ -32,11 +33,6 @@ fun Application.configureRouting() {
             } else {
                 call.respond(HttpStatusCode.BadRequest, "Invalid position")
             }
-        }
-
-        get("/gameState") {
-            val gameState = repo.getGameState(repo.gameBoard)
-            call.respond(HttpStatusCode.OK, gameState)
         }
 
         get("/resetGame") {

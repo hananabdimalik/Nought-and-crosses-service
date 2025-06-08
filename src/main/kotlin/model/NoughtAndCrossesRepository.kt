@@ -42,7 +42,7 @@ class NoughtAndCrossesRepository {
         2, 4, 6
     ).chunked(3)
 
-    fun getGameState(list: List<GameCell>): GameState {
+    fun getGameSession(list: List<GameCell>): GameSession {
         val noughtCells = mutableListOf<Int>()
         val crossCells = mutableListOf<Int>()
 
@@ -56,14 +56,14 @@ class NoughtAndCrossesRepository {
 
         winningCombo.forEach {
             if (noughtCells.containsAll(it)) {
-                return GameState.Win
+                return gameSession.copy(hasGameBegan = false, gameState = GameState.Win)
             } else if (crossCells.containsAll(it)) {
-                return GameState.Win
+                return gameSession.copy(hasGameBegan = false, gameState = GameState.Win)
             } else if (crossCells.size + noughtCells.size == 9 && winningCombo[winningCombo.size - 1] == it) {
-                return GameState.Draw
+                return gameSession.copy(hasGameBegan = false, gameState = GameState.Draw)
             }
         }
-        return GameState.None
+        return gameSession
     }
 
     fun resetGame(): List<GameCell> {
