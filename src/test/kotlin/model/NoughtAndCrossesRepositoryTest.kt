@@ -51,23 +51,31 @@ class NoughtAndCrossesRepositoryTest {
 
     @Test
     fun `addPlayer, when addPlayer is called with one name, gameSession player object is updated with name`() {
-        repo.addPlayer("Bob")
-        assertTrue(repo.gameSession.players.contains("Bob"))
+        repo.addPlayer(Player("Bob", "id"))
+        assertTrue(repo.gameSession.players?.contains(Player("Bob", "id")) == true)
     }
 
     @Test
     fun `addPlayer, if player name is empty, players is not updated`() {
-        repo.addPlayer("")
-        assertTrue(repo.gameSession.players.isEmpty())
+        repo.addPlayer(Player(""))
+        assertTrue(repo.gameSession.players?.isEmpty() == true)
     }
 
     @Test
     fun `addPlayer, if methods is called more than 2 times, the players list is not updated`(){
-        repo.addPlayer("Bob")
-        repo.addPlayer("Dylan")
-        assertTrue(repo.gameSession.players.size == 2)
+        repo.addPlayer(Player("Bob", "id"))
+        repo.addPlayer(Player("Dylan", "newId"))
+        assertTrue(repo.gameSession.players?.size == 2)
 
-        repo.addPlayer("Mitch")
-        assertTrue(repo.gameSession.players.size == 2)
+        repo.addPlayer(Player("Mitch", "otherId"))
+        assertTrue(repo.gameSession.players?.size == 2)
+    }
+
+    @Test
+    fun `addPlayer, if 2 players have the same id, the players list size in 1`() {
+        repo.addPlayer(Player("Bob", "id"))
+        repo.addPlayer(Player("Dylan", "id"))
+
+        assertEquals(1, repo.gameSession.players?.size)
     }
 }

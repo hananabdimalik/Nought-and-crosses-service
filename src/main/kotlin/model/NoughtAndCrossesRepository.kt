@@ -5,6 +5,7 @@ class NoughtAndCrossesRepository {
     val gameBoard = MutableList(9) { GameCell(GamePieces.Unplayed, it) }
 
     var gameSession = GameSession()
+    var newPlayer = Player()
 
     private var noughtCount = 0
     private var crossCount = 0
@@ -78,12 +79,33 @@ class NoughtAndCrossesRepository {
         return gameBoard
     }
 
-    fun addPlayer(player: String) {
-        if (player.isNotEmpty()) {
-            if (gameSession.players.size in 0 until 2) {
-                gameSession = gameSession.copy(players = gameSession.players + player)
+    fun addPlayer(player: Player) {
+        if (!player.name.isNullOrEmpty()) {
+            if (gameSession.players == null || gameSession.players?.size in 0 until 2) {
+                val newPlayersList = mutableListOf<Player>()
+
+                val playersIds = mutableListOf<String?>()
+                gameSession.players?.forEach {
+                    playersIds.add(it.id)
+                }
+
+                newPlayer = newPlayer.copy(player.name, player.id, player.gamePiece)
+
+                // add player if id is new aka one device per player
+                if (gameSession.players?.isNotEmpty() == true) {
+                    playersIds.forEach {
+                        if (player.id != it) {
+                            newPlayersList.add(newPlayer)
+                            gameSession = gameSession.copy(players =  gameSession.players?.plus(newPlayersList))
+                        }
+                    }
+                } else {
+                    newPlayersList.add(newPlayer)
+                    gameSession = gameSession.copy(players = newPlayersList)
+                }
             }
-            if (gameSession.players.size == 2) {
+
+            if (gameSession.players?.size == 2) {
                 gameSession = gameSession.copy(hasGameBegan = true, gameState = GameState.None)
             }
         }
