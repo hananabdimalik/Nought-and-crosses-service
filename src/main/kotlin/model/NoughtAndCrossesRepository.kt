@@ -9,6 +9,7 @@ class NoughtAndCrossesRepository {
 
     private var noughtCount = 0
     private var crossCount = 0
+    var currentPlayer = Player()
 
     private fun alternativeGamePiece(): GamePieces {
         return when {
@@ -25,10 +26,14 @@ class NoughtAndCrossesRepository {
         }
     }
 
-    fun updateGameBoard(position: Int): List<GameCell> {
-        if (gameSession.hasGameBegan && position in 0 until gameBoard.size) {
-            gameBoard[position] = gameBoard[position].copy(alternativeGamePiece(), position)
+    fun updateGameBoard(position: Int, player: Player): List<GameCell> {
+        if (currentPlayer.id != player.id) {
+            currentPlayer = player
+            if (gameSession.hasGameBegan && position in 0 until gameBoard.size) {
+                gameBoard[position] = gameBoard[position].copy(alternativeGamePiece(), position)
+            }
         }
+
         return gameBoard
     }
 
@@ -69,6 +74,7 @@ class NoughtAndCrossesRepository {
 
     fun resetGame(): List<GameCell> {
         gameSession = gameSession.copy(hasGameBegan = true, gameState = GameState.None)
+        currentPlayer = Player()
         noughtCount = 0
         crossCount = 0
         gameBoard.forEachIndexed { index, cell ->

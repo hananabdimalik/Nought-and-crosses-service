@@ -9,14 +9,55 @@ class NoughtAndCrossesRepositoryTest {
     val repo = NoughtAndCrossesRepository()
 
     @Test
-    fun `updateGameBoard, when cell position, gameBoard is updated with GridCell containing a gamePiece at said position`() {
+    fun `updateGameBoard, given a cell position, gameBoard is updated with GridCell containing a gamePiece at said position`() {
         repo.gameSession = repo.gameSession.copy(hasGameBegan = true)
-        repo.updateGameBoard(2)
+        repo.updateGameBoard(2, Player("Bob", "Bob-Id"))
         val expected = listOf(
             GameCell(GamePieces.Unplayed, 0),
             GameCell(GamePieces.Unplayed, 1),
             GameCell(GamePieces.Nought, 2),
             GameCell(GamePieces.Unplayed, 3),
+            GameCell(GamePieces.Unplayed, 4),
+            GameCell(GamePieces.Unplayed, 5),
+            GameCell(GamePieces.Unplayed, 6),
+            GameCell(GamePieces.Unplayed, 7),
+            GameCell(GamePieces.Unplayed, 8),
+        )
+        assertEquals(expected, repo.gameBoard)
+    }
+
+    @Test
+    fun `updateGameBoard, given a cell position when updateGameBoard is called twice by the same player, gameBoard is not updated the second time`() {
+        repo.gameSession = repo.gameSession.copy(hasGameBegan = true)
+
+        repo.updateGameBoard(2, Player("Bob", "Bob-Id"))
+        repo.updateGameBoard(3, Player("Bob", "Bob-Id"))
+        val expected = listOf(
+            GameCell(GamePieces.Unplayed, 0),
+            GameCell(GamePieces.Unplayed, 1),
+            GameCell(GamePieces.Nought, 2),
+            GameCell(GamePieces.Unplayed, 3),
+            GameCell(GamePieces.Unplayed, 4),
+            GameCell(GamePieces.Unplayed, 5),
+            GameCell(GamePieces.Unplayed, 6),
+            GameCell(GamePieces.Unplayed, 7),
+            GameCell(GamePieces.Unplayed, 8),
+        )
+        assertEquals(expected, repo.gameBoard)
+    }
+
+    @Test
+    fun `updateGameBoard, given a cell position when updateGameBoard is called twice by the different player, gameBoard is  updated each time`() {
+        repo.gameSession = repo.gameSession.copy(hasGameBegan = true)
+
+        repo.updateGameBoard(2, Player("Bob", "Bob-Id"))
+        repo.updateGameBoard(3, Player("Dylan", "Dylan-Id"))
+
+        val expected = listOf(
+            GameCell(GamePieces.Unplayed, 0),
+            GameCell(GamePieces.Unplayed, 1),
+            GameCell(GamePieces.Nought, 2),
+            GameCell(GamePieces.Cross, 3),
             GameCell(GamePieces.Unplayed, 4),
             GameCell(GamePieces.Unplayed, 5),
             GameCell(GamePieces.Unplayed, 6),
