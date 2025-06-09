@@ -116,4 +116,14 @@ class NoughtAndCrossesRepository {
             }
         }
     }
+
+    fun restartSession(): GameSession {
+        gameSession = GameSession()
+        gameBoard.forEachIndexed { index, cell ->
+            if(index in 0 until gameBoard.size) {
+                gameBoard[index] = gameBoard[index].copy(piece = GamePieces.Unplayed, index)
+            }
+        }
+        return gameSession
+    }
 }

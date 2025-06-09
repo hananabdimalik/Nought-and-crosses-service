@@ -148,4 +148,13 @@ class NoughtAndCrossesRepositoryTest {
         assertEquals(GameState.Win, actual.gameState)
         assertEquals(player, actual.currentPlayer)
     }
+
+    @Test
+    fun `restartSession, when restartSession is called, gameSession is updated with new states`() {
+        repo.restartSession()
+
+        assertEquals(GameSession(), repo.gameSession)
+        val expected = List(9) { GameCell(GamePieces.Unplayed, it) }
+        assertEquals(expected, repo.gameBoard)
+    }
 }

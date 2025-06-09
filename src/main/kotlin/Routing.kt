@@ -41,5 +41,10 @@ fun Application.configureRouting() {
             val newGameBoard = repo.resetGame()
             call.respond(HttpStatusCode.OK, newGameBoard)
         }
+
+        get("/restartGame") {
+            val newGameSession = repo.restartSession()
+            call.respond(HttpStatusCode.OK, newGameSession)
+        }
     }
 }
