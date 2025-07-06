@@ -11,8 +11,8 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.testing.*
 import org.mockito.Mockito.mock
-import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -20,34 +20,22 @@ class RoutingTest {
 
     val repo: NoughtAndCrossesRepository = mock()
 
-    @Test
-    fun `Get gameSession returns 200 and session data`() = testApplication {
-        whenever(repo.getGameSession()).thenReturn(GameSession())
-        val client = configureServerAndGetClient()
-
-        val response = client.get("/gameSession") {
-            contentType(ContentType.Application.Json)
-            accept(ContentType.Application.Json)
-        }
-
-        val responseBody: GameSession = response.body()
-
-        assertEquals(HttpStatusCode.OK, response.status)
-        assertEquals(GameSession(), responseBody)
+    @BeforeTest
+    fun setup() {
+        repo.session = GameSession()
     }
 
     @Test
     fun `Post join returns 200 and adds a player`() = testApplication {
         val client = configureServerAndGetClient()
-
         val response = client.post("/join") {
             contentType(ContentType.Application.Json)
             setBody(Player(name = "Bob", id = "id"))
         }
 
-        val responseBody: Player = response.body()
+        val responseBody: GameSessionState = response.body()
         assertEquals(HttpStatusCode.OK, response.status)
-        assertEquals(Player(name = "Bob", id = "id"), responseBody)
+        assertEquals(GameSessionState.Started, responseBody)
     }
 
     @Test
@@ -68,7 +56,7 @@ class RoutingTest {
     @Test
     fun `updateBoard when player makes a move, returns a 200 with updated board`() = testApplication {
         val expected = MutableList(9) { if (it == 2) GameCell(Nought, 2) else GameCell(piece = Unplayed, it) }
-        whenever(repo.session).thenReturn(GameSession(hasGameBegan = true))
+        whenever(repo.session).thenReturn(GameSession(gameSessionState = GameSessionState.Started))
 //        whenever(repo.updateGameBoard(any(), any())).thenReturn(expected)
 
         val client = configureServerAndGetClient()
@@ -106,11 +94,11 @@ class RoutingTest {
     }
 
     @Test
-    fun `restartGame, returns 200 with new gameSession`() = testApplication {
+    fun `restartGameSession, returns 200 with new gameSession`() = testApplication {
         whenever(repo.restartSession()).thenReturn(GameSession())
 
         val client = configureServerAndGetClient()
-        val response = client.get("/restartGame")
+        val response = client.get("/restartGameSession")
 
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals(GameSession(), response.body<GameSession>())

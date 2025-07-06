@@ -1,15 +1,44 @@
 package com.example.model
 
-class NoughtAndCrossesRepository {
+import java.util.*
 
+class NoughtAndCrossesRepository(val sessionManager: GameSessionManager) {
+
+    val gameSessionId = UUID.randomUUID().toString()
     val gameBoard = MutableList(9) { GameCell(GamePieces.Unplayed, it) }
 
-    var session = GameSession()
+    lateinit var session: GameSession
     var newPlayer = Player()
 
     private var noughtCount = 0
     private var crossCount = 0
     private var currentPlayer = Player()
+
+    private val winningCombo = listOf(
+        0, 1, 2,
+        3, 4, 5,
+        6, 7, 8,
+        0, 3, 6,
+        1, 4, 7,
+        2, 5, 8,
+        0, 4, 8,
+        2, 4, 6
+    ).chunked(3)
+
+    fun hostSession(player: Player): GameSession {
+        session = sessionManager.createGameSession(gameSessionId)
+        addPlayer(player)
+        return session
+    }
+
+    fun joinGameSession(player: Player) {
+        addPlayer(player)
+        val getCurrentGameSession = sessionManager.getGameSession(gameSessionId)
+        session = getCurrentGameSession.copy(players = session.players, gameState = session.gameState)
+        if (session.players?.size == 2) {
+            session = session.copy(gameSessionState = GameSessionState.Started)
+        }
+    }
 
     private fun alternativeGamePiece(): GamePieces {
         return when {
@@ -29,24 +58,13 @@ class NoughtAndCrossesRepository {
     fun updateGameBoard(position: Int, player: Player): List<GameCell> {
         if (currentPlayer.id != player.id) {
             currentPlayer = player
-            if (session.hasGameBegan && position in 0 until gameBoard.size) {
+            if (session.gameSessionState == GameSessionState.Started && position in 0 until gameBoard.size) {
                 gameBoard[position] = gameBoard[position].copy(alternativeGamePiece(), position)
             }
         }
 
         return gameBoard
     }
-
-    private val winningCombo = listOf(
-        0, 1, 2,
-        3, 4, 5,
-        6, 7, 8,
-        0, 3, 6,
-        1, 4, 7,
-        2, 5, 8,
-        0, 4, 8,
-        2, 4, 6
-    ).chunked(3)
 
     fun getGameSession(): GameSession {
         val noughtCells = mutableListOf<Int>()
@@ -62,18 +80,26 @@ class NoughtAndCrossesRepository {
 
         winningCombo.forEach {
             if (noughtCells.containsAll(it)) {
-                return session.copy(hasGameBegan = false, gameState = GameState.Win, currentPlayer = currentPlayer)
+                return session.copy(
+                    gameSessionState = GameSessionState.Ended,
+                    gameState = GameState.Win,
+                    currentPlayer = currentPlayer
+                )
             } else if (crossCells.containsAll(it)) {
-                return session.copy(hasGameBegan = false, gameState = GameState.Win, currentPlayer = currentPlayer)
+                return session.copy(
+                    gameSessionState = GameSessionState.Ended,
+                    gameState = GameState.Win,
+                    currentPlayer = currentPlayer
+                )
             } else if (crossCells.size + noughtCells.size == 9 && winningCombo[winningCombo.size - 1] == it) {
-                return session.copy(hasGameBegan = false, gameState = GameState.Draw)
+                return session.copy(gameSessionState = GameSessionState.Ended, gameState = GameState.Draw)
             }
         }
         return session
     }
 
     fun resetGame(): List<GameCell> {
-        session = session.copy(hasGameBegan = true, gameState = GameState.None)
+        session = session.copy(gameSessionState = GameSessionState.Ended, gameState = GameState.None)
         currentPlayer = Player()
         noughtCount = 0
         crossCount = 0
@@ -85,7 +111,7 @@ class NoughtAndCrossesRepository {
         return gameBoard
     }
 
-    fun addPlayer(player: Player) {
+    private fun addPlayer(player: Player) {
         if (!player.name.isNullOrEmpty()) {
             if (session.players == null || session.players?.size in 0 until 2) {
                 val newPlayersList = mutableListOf<Player>()
@@ -110,14 +136,11 @@ class NoughtAndCrossesRepository {
                     session = session.copy(players = newPlayersList)
                 }
             }
-
-            if (session.players?.size == 2) {
-                session = session.copy(hasGameBegan = true, gameState = GameState.None)
-            }
         }
     }
 
     fun restartSession(): GameSession {
+        sessionManager.removeGameSession(gameSessionId)
         session = GameSession()
         gameBoard.forEachIndexed { index, cell ->
             if(index in 0 until gameBoard.size) {

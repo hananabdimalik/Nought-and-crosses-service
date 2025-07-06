@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.model.GameSessionManager
 import com.example.model.NoughtAndCrossesRepository
 import io.ktor.server.application.*
 
@@ -8,8 +9,8 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-    val repository = NoughtAndCrossesRepository()
+    val sessionManager = GameSessionManager()
     configureSerialization()
     configureMonitoring()
-    configureRouting(repository)
+    configureRouting(NoughtAndCrossesRepository(sessionManager))
 }

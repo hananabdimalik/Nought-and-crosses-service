@@ -10,15 +10,16 @@ import io.ktor.server.routing.*
 
 fun Application.configureRouting(repo: NoughtAndCrossesRepository) {
     routing {
-        get("/gameSession"){
-            val gameSession = repo.getGameSession()
-            call.respond(HttpStatusCode.OK, gameSession)
+        post("/hostSession") {
+            val player = call.receive<Player>()
+            repo.hostSession(player)
+            call.respond(HttpStatusCode.OK, repo.session)
         }
 
         post ("/join"){
             val player = call.receive<Player>()
-            repo.addPlayer(player)
-            call.respond(HttpStatusCode.OK, player)
+            repo.joinGameSession(player)
+            call.respond(HttpStatusCode.OK, repo.session.gameSessionState)
         }
 
         get("/gameBoard") {
@@ -41,7 +42,7 @@ fun Application.configureRouting(repo: NoughtAndCrossesRepository) {
             call.respond(HttpStatusCode.OK, newGameBoard)
         }
 
-        get("/restartGame") {
+        get("/restartGameSession") {
             val newGameSession = repo.restartSession()
             call.respond(HttpStatusCode.OK, newGameSession)
         }
