@@ -10,7 +10,7 @@ class NoughtAndCrossesRepositoryTest {
 
     @Test
     fun `updateGameBoard, given a cell position, gameBoard is updated with GridCell containing a gamePiece at said position`() {
-        repo.gameSession = repo.gameSession.copy(hasGameBegan = true)
+        repo.session = repo.session.copy(hasGameBegan = true)
         repo.updateGameBoard(2, Player("Bob", "Bob-Id"))
         val expected = listOf(
             GameCell(GamePieces.Unplayed, 0),
@@ -28,7 +28,7 @@ class NoughtAndCrossesRepositoryTest {
 
     @Test
     fun `updateGameBoard, given a cell position when updateGameBoard is called twice by the same player, gameBoard is not updated the second time`() {
-        repo.gameSession = repo.gameSession.copy(hasGameBegan = true)
+        repo.session = repo.session.copy(hasGameBegan = true)
 
         repo.updateGameBoard(2, Player("Bob", "Bob-Id"))
         repo.updateGameBoard(3, Player("Bob", "Bob-Id"))
@@ -48,7 +48,7 @@ class NoughtAndCrossesRepositoryTest {
 
     @Test
     fun `updateGameBoard, given a cell position when updateGameBoard is called twice by the different player, gameBoard is  updated each time`() {
-        repo.gameSession = repo.gameSession.copy(hasGameBegan = true)
+        repo.session = repo.session.copy(hasGameBegan = true)
 
         repo.updateGameBoard(2, Player("Bob", "Bob-Id"))
         repo.updateGameBoard(3, Player("Dylan", "Dylan-Id"))
@@ -81,8 +81,8 @@ class NoughtAndCrossesRepositoryTest {
             GameCell(GamePieces.Unplayed, 7),
             GameCell(GamePieces.Unplayed, 8),
         )
-        val actual = repo.getGameSession(input)
-        assertEquals(repo.gameSession.gameState, actual.gameState)
+        val actual = repo.getGameSession()
+        assertEquals(repo.session.gameState, actual.gameState)
     }
 
     @Test
@@ -93,23 +93,23 @@ class NoughtAndCrossesRepositoryTest {
     @Test
     fun `addPlayer, when addPlayer is called with one name, gameSession player object is updated with name`() {
         repo.addPlayer(Player("Bob", "id"))
-        assertTrue(repo.gameSession.players?.contains(Player("Bob", "id")) == true)
+        assertTrue(repo.session.players?.contains(Player("Bob", "id", gamePiece = GamePieces.Nought)) == true)
     }
 
     @Test
     fun `addPlayer, if player name is empty, players is not updated`() {
         repo.addPlayer(Player(""))
-        assertTrue(repo.gameSession.players?.isEmpty() == true)
+        assertTrue(repo.session.players?.isEmpty() == true)
     }
 
     @Test
     fun `addPlayer, if methods is called more than 2 times, the players list is not updated`(){
         repo.addPlayer(Player("Bob", "id"))
         repo.addPlayer(Player("Dylan", "newId"))
-        assertTrue(repo.gameSession.players?.size == 2)
+        assertTrue(repo.session.players?.size == 2)
 
         repo.addPlayer(Player("Mitch", "otherId"))
-        assertTrue(repo.gameSession.players?.size == 2)
+        assertTrue(repo.session.players?.size == 2)
     }
 
     @Test
@@ -117,43 +117,48 @@ class NoughtAndCrossesRepositoryTest {
         repo.addPlayer(Player("Bob", "id"))
         repo.addPlayer(Player("Dylan", "id"))
 
-        assertEquals(1, repo.gameSession.players?.size)
+        assertEquals(1, repo.session.players?.size)
     }
 
     @Test
     fun `getGameSession, given a winningCombo, return winning player`() {
 
         // add player
-        val player = Player("Dylan", "id")
-        repo.addPlayer(player)
+        val player1 = Player("Dylan", "id", gamePiece = GamePieces.Nought)
+        val player2 = Player("Bob", "Bobs-id", gamePiece = GamePieces.Cross)
+        repo.addPlayer(player2)
+        repo.session = repo.session.copy(currentPlayer = player1, hasGameBegan = true)
 
-        // set currentPlayer
-        repo.updateGameBoard(3, player)
+        // replicate a game
+        repo.updateGameBoard(2, player1.copy(gamePiece = GamePieces.Nought))
+        repo.session = repo.session.copy(currentPlayer = player2)
 
-        val input = listOf(
-            GameCell(GamePieces.Unplayed, 0),
-            GameCell(GamePieces.Unplayed, 1),
-            GameCell(GamePieces.Nought, 2),
-            GameCell(GamePieces.Cross, 3),
-            GameCell(GamePieces.Cross, 4),
-            GameCell(GamePieces.Cross, 5),
-            GameCell(GamePieces.Nought, 6),
-            GameCell(GamePieces.Unplayed, 7),
-            GameCell(GamePieces.Unplayed, 8),
-        )
+        repo.updateGameBoard(3, player2.copy(gamePiece = GamePieces.Cross))
+        repo.session = repo.session.copy(currentPlayer = player1)
+
+        repo.updateGameBoard(0, player1.copy(gamePiece = GamePieces.Nought))
+        repo.session = repo.session.copy(currentPlayer = player2)
+
+        repo.updateGameBoard(4, player2.copy(gamePiece = GamePieces.Cross))
+        repo.session = repo.session.copy(currentPlayer = player1)
+
+        repo.updateGameBoard(6, player1.copy(gamePiece = GamePieces.Nought))
+        repo.session = repo.session.copy(currentPlayer = player2)
+
+        repo.updateGameBoard(5, player2.copy(gamePiece = GamePieces.Cross))
 
         // get game state
-        val actual = repo.getGameSession(input)
+        val actual = repo.getGameSession()
 
         assertEquals(GameState.Win, actual.gameState)
-        assertEquals(player, actual.currentPlayer)
+        assertEquals(player2, actual.currentPlayer)
     }
 
     @Test
     fun `restartSession, when restartSession is called, gameSession is updated with new states`() {
         repo.restartSession()
 
-        assertEquals(GameSession(), repo.gameSession)
+        assertEquals(GameSession(), repo.session)
         val expected = List(9) { GameCell(GamePieces.Unplayed, it) }
         assertEquals(expected, repo.gameBoard)
     }

@@ -8,11 +8,10 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Application.configureRouting() {
-    val repo = NoughtAndCrossesRepository()
+fun Application.configureRouting(repo: NoughtAndCrossesRepository) {
     routing {
         get("/gameSession"){
-            val gameSession = repo.getGameSession(repo.gameBoard)
+            val gameSession = repo.getGameSession()
             call.respond(HttpStatusCode.OK, gameSession)
         }
 
@@ -26,8 +25,8 @@ fun Application.configureRouting() {
             call.respond(HttpStatusCode.OK, repo.gameBoard)
         }
 
-        post("updateBoard/{position}") {
-            val position = call.parameters["position"]?.toInt()
+        post("/updateBoard/{position}") {
+            val position = call.parameters["position"]?.toIntOrNull() // if just toInt -> unhandled exception crashes the handler, and Ktor returns a 500
             val player = call.receive<Player>()
             if (position != null) {
                 val updatedBoard = repo.updateGameBoard(position, player)

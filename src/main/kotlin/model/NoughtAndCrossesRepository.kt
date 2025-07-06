@@ -4,7 +4,7 @@ class NoughtAndCrossesRepository {
 
     val gameBoard = MutableList(9) { GameCell(GamePieces.Unplayed, it) }
 
-    var gameSession = GameSession()
+    var session = GameSession()
     var newPlayer = Player()
 
     private var noughtCount = 0
@@ -29,7 +29,7 @@ class NoughtAndCrossesRepository {
     fun updateGameBoard(position: Int, player: Player): List<GameCell> {
         if (currentPlayer.id != player.id) {
             currentPlayer = player
-            if (gameSession.hasGameBegan && position in 0 until gameBoard.size) {
+            if (session.hasGameBegan && position in 0 until gameBoard.size) {
                 gameBoard[position] = gameBoard[position].copy(alternativeGamePiece(), position)
             }
         }
@@ -48,11 +48,11 @@ class NoughtAndCrossesRepository {
         2, 4, 6
     ).chunked(3)
 
-    fun getGameSession(list: List<GameCell>): GameSession {
+    fun getGameSession(): GameSession {
         val noughtCells = mutableListOf<Int>()
         val crossCells = mutableListOf<Int>()
 
-        list.forEachIndexed { index, cell ->
+        gameBoard.forEachIndexed { index, cell ->
             if (cell.piece == GamePieces.Nought) {
                 noughtCells.add(index)
             } else if (cell.piece == GamePieces.Cross) {
@@ -62,18 +62,18 @@ class NoughtAndCrossesRepository {
 
         winningCombo.forEach {
             if (noughtCells.containsAll(it)) {
-                return gameSession.copy(hasGameBegan = false, gameState = GameState.Win, currentPlayer = currentPlayer)
+                return session.copy(hasGameBegan = false, gameState = GameState.Win, currentPlayer = currentPlayer)
             } else if (crossCells.containsAll(it)) {
-                return gameSession.copy(hasGameBegan = false, gameState = GameState.Win, currentPlayer = currentPlayer)
+                return session.copy(hasGameBegan = false, gameState = GameState.Win, currentPlayer = currentPlayer)
             } else if (crossCells.size + noughtCells.size == 9 && winningCombo[winningCombo.size - 1] == it) {
-                return gameSession.copy(hasGameBegan = false, gameState = GameState.Draw)
+                return session.copy(hasGameBegan = false, gameState = GameState.Draw)
             }
         }
-        return gameSession
+        return session
     }
 
     fun resetGame(): List<GameCell> {
-        gameSession = gameSession.copy(hasGameBegan = true, gameState = GameState.None)
+        session = session.copy(hasGameBegan = true, gameState = GameState.None)
         currentPlayer = Player()
         noughtCount = 0
         crossCount = 0
@@ -87,43 +87,43 @@ class NoughtAndCrossesRepository {
 
     fun addPlayer(player: Player) {
         if (!player.name.isNullOrEmpty()) {
-            if (gameSession.players == null || gameSession.players?.size in 0 until 2) {
+            if (session.players == null || session.players?.size in 0 until 2) {
                 val newPlayersList = mutableListOf<Player>()
 
                 val playersIds = mutableListOf<String?>()
-                gameSession.players?.forEach {
+                session.players?.forEach {
                     playersIds.add(it.id)
                 }
 
-                newPlayer = newPlayer.copy(player.name, player.id, player.gamePiece)
+                newPlayer = newPlayer.copy(player.name, player.id, GamePieces.Nought)
 
                 // add player if id is new aka one device per player
-                if (gameSession.players?.isNotEmpty() == true) {
+                if (session.players?.isNotEmpty() == true) {
                     playersIds.forEach {
                         if (player.id != it) {
-                            newPlayersList.add(newPlayer)
-                            gameSession = gameSession.copy(players =  gameSession.players?.plus(newPlayersList))
+                            newPlayersList.add(newPlayer.copy(gamePiece = GamePieces.Cross))
+                            session = session.copy(players = session.players?.plus(newPlayersList))
                         }
                     }
                 } else {
                     newPlayersList.add(newPlayer)
-                    gameSession = gameSession.copy(players = newPlayersList)
+                    session = session.copy(players = newPlayersList)
                 }
             }
 
-            if (gameSession.players?.size == 2) {
-                gameSession = gameSession.copy(hasGameBegan = true, gameState = GameState.None)
+            if (session.players?.size == 2) {
+                session = session.copy(hasGameBegan = true, gameState = GameState.None)
             }
         }
     }
 
     fun restartSession(): GameSession {
-        gameSession = GameSession()
+        session = GameSession()
         gameBoard.forEachIndexed { index, cell ->
             if(index in 0 until gameBoard.size) {
                 gameBoard[index] = gameBoard[index].copy(piece = GamePieces.Unplayed, index)
             }
         }
-        return gameSession
+        return session
     }
 }

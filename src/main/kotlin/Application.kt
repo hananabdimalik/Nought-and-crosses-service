@@ -1,22 +1,14 @@
 package com.example
 
-import io.ktor.serialization.kotlinx.json.json
+import com.example.model.NoughtAndCrossesRepository
 import io.ktor.server.application.*
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import kotlinx.serialization.json.Json
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
-fun Application.module() {
-    install(ContentNegotiation) {
-        json(Json {
-            prettyPrint = true
-            isLenient = true
-        })
-    }
+fun Application.module(repository: NoughtAndCrossesRepository) {
     configureSerialization()
     configureMonitoring()
-    configureRouting()
+    configureRouting(repository)
 }

@@ -25,6 +25,9 @@ dependencies {
     implementation("io.ktor:ktor-server-netty")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
-    testImplementation("io.ktor:ktor-server-test-host")
+    implementation("io.ktor:ktor-client-content-negotiation:$kotlin_version")
+    testImplementation("io.ktor:ktor-server-test-host:$kotlin_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("org.mockito:mockito-core:5.18.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 }
