@@ -69,7 +69,7 @@ class RoutingTest {
     fun `updateBoard when player makes a move, returns a 200 with updated board`() = testApplication {
         val expected = MutableList(9) { if (it == 2) GameCell(Nought, 2) else GameCell(piece = Unplayed, it) }
         whenever(repo.session).thenReturn(GameSession(hasGameBegan = true))
-        whenever(repo.updateGameBoard(any(), any())).thenReturn(expected)
+//        whenever(repo.updateGameBoard(any(), any())).thenReturn(expected)
 
         val client = configureServerAndGetClient()
         val response = client.post("/updateBoard/2") {
@@ -102,7 +102,7 @@ class RoutingTest {
         val response = client.get("/resetGame")
 
         assertEquals(HttpStatusCode.OK, response.status)
-        assertEquals(listOf(), response.body<List<GameCell>>())
+        assertEquals(List(9) { GameCell(Unplayed, it) }, response.body<List<GameCell>>())
     }
 
     @Test
@@ -117,7 +117,7 @@ class RoutingTest {
     }
 
     private fun ApplicationTestBuilder.configureServerAndGetClient(): HttpClient {
-        application { module(repo) }
+        application { module() }
         val client = createClient {
             // use client side content negotiation
             install(ContentNegotiation) {
