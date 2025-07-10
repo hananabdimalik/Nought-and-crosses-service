@@ -11,6 +11,7 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.testing.*
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -27,6 +28,8 @@ class RoutingTest {
 
     @Test
     fun `Post join returns 200 and adds a player`() = testApplication {
+        whenever(repo.hostSession(any())).thenReturn(any())
+//        whenever(repo.joinGameSession(any())).thenReturn(Unit)
         val client = configureServerAndGetClient()
         val response = client.post("/join") {
             contentType(ContentType.Application.Json)

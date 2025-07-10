@@ -1,8 +1,6 @@
 package com.example.model
 
-class GameSessionManager {
-
-    val sessions = mutableMapOf<String, GameSession>() // how to test remove func in sessions if sessions s private?
+class GameSessionManager(val sessions: MutableMap<String, GameSession> = mutableMapOf()) {
 
     fun createGameSession(sessionId: String): GameSession {
         val session = GameSession()
