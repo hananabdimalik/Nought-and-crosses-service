@@ -15,6 +15,7 @@ enum class GameState{Win, Draw, None}
 
 @Serializable
 data class GameSession(
+    val sessionId: String? = null,
     val players: List<Player>? = emptyList(),
     val gameState: GameState = GameState.None,
     val currentPlayer: Player? = null,

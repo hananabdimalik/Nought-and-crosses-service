@@ -9,24 +9,25 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Application.configureRouting(repo: NoughtAndCrossesRepository) {
+    val gameSessionManager = repo.sessionManager
     routing {
         post("/hostSession") {
             val player = call.receive<Player>()
-            repo.hostSession(player)
-            call.respond(HttpStatusCode.OK, repo.session)
+            gameSessionManager.hostSession(player)
+            call.respond(HttpStatusCode.OK, gameSessionManager.gameSession)
         }
 
-        post ("/join"){
+        post ("/joinSession"){
             val player = call.receive<Player>()
-            repo.joinGameSession(player)
-            call.respond(HttpStatusCode.OK, repo.session.gameSessionState)
+            gameSessionManager.joinGameSession(player)
+            call.respond(HttpStatusCode.OK, gameSessionManager.gameSession.gameSessionState)
         }
 
         get("/gameBoard") {
             call.respond(HttpStatusCode.OK, repo.gameBoard)
         }
 
-        post("/updateBoard/{position}") {
+        post("/updateBoard/{position}") { // request sessionId and position
             val position = call.parameters["position"]?.toIntOrNull() // if just toInt -> unhandled exception crashes the handler, and Ktor returns a 500
             val player = call.receive<Player>()
             if (position != null) {
@@ -43,7 +44,7 @@ fun Application.configureRouting(repo: NoughtAndCrossesRepository) {
         }
 
         get("/restartGameSession") {
-            val newGameSession = repo.restartSession()
+            val newGameSession = gameSessionManager.restartSession()
             call.respond(HttpStatusCode.OK, newGameSession)
         }
     }
