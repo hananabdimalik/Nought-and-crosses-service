@@ -19,7 +19,8 @@ data class GameSession(
     val players: List<Player>? = emptyList(),
     val gameState: GameState = GameState.None,
     val currentPlayer: Player? = null,
-    var gameSessionState: GameSessionState = GameSessionState.Ended
+    var gameSessionState: GameSessionState = GameSessionState.Ended,
+    val error: String? = null,
 )
 
 @Serializable

@@ -1,28 +1,33 @@
 package com.example.model
 
 class GameSessionManager(
-    val sessions: MutableMap<String, GameSession> = mutableMapOf(),
-    idGenerator: IdGenerator
+    val idGenerator: IdGenerator
 ) {
-
+    val sessions: MutableMap<String, GameSession> = mutableMapOf()
     var gameSession: GameSession = GameSession()
-    private val gameSessionId = idGenerator.gameSessionId()
-    private var newPlayer = Player()
 
+    // create a new gameSession each time a game is hosted
     fun hostSession(player: Player): GameSession? {
+        val gameSessionId = idGenerator.gameSessionId()
+        gameSession = GameSession()
         sessions[gameSessionId] = gameSession
         addPlayer(player, gameSession)
         return if (gameSession.players?.isNotEmpty() == true) {
-            gameSession = gameSession.copy(gameSessionState = GameSessionState.Waiting, sessionId = gameSession.sessionId)
+            gameSession = gameSession.copy(gameSessionState = GameSessionState.Waiting, sessionId = gameSessionId)
             gameSession
         } else null
     }
 
+    // Player joins last hosted game
     fun joinGameSession(player: Player) {
-        addPlayer(player, gameSession)
-        gameSession = gameSession.copy(players = gameSession.players)
-        if (gameSession.players?.size == 2) {
-            gameSession = gameSession.copy(gameSessionState = GameSessionState.Started)
+        if (sessions.isNotEmpty()) {
+            addPlayer(player, gameSession)
+            gameSession = gameSession.copy(players = gameSession.players)
+            if (gameSession.players?.size == 2) {
+                gameSession = gameSession.copy(gameSessionState = GameSessionState.Started)
+            }
+        } else {
+            gameSession = gameSession.copy(error = "Please enter a game session!")
         }
     }
 
@@ -31,7 +36,9 @@ class GameSessionManager(
             return
         }
 
-        if (isPlayerValid(player) && session.players == null || session.players?.size in 0 until 2) {
+        if (isPlayerValid(player) && session.players?.size in 0 until 2) {
+            var newPlayer = Player()
+
             val newPlayersList = mutableListOf<Player>()
 
             val playersIds = mutableListOf<String?>()
@@ -50,10 +57,8 @@ class GameSessionManager(
                     }
                 }
             } else {
-                if (isPlayerValid(newPlayer)) {
                     newPlayersList.add(newPlayer)
                     gameSession = session.copy(players = newPlayersList)
-                }
             }
         }
     }
@@ -61,7 +66,7 @@ class GameSessionManager(
     private fun isPlayerValid(player: Player) =
         !player.name.isNullOrEmpty() && !player.id.isNullOrEmpty()
 
-    fun restartSession(): GameSession {
+    fun restartSession(gameSessionId: String): GameSession {
         sessions.remove(gameSessionId)
         gameSession = GameSession()
         return gameSession

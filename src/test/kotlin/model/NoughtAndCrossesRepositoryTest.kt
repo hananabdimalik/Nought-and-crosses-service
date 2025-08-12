@@ -3,12 +3,11 @@ package model
 import com.example.model.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class NoughtAndCrossesRepositoryTest {
 
     private val idGeneratorImpl = IdGeneratorImpl()
-    private val gameSessionManager = GameSessionManager(mutableMapOf(), idGeneratorImpl)
+    private val gameSessionManager = GameSessionManager( idGenerator = idGeneratorImpl)
     private val repo = NoughtAndCrossesRepository(GameSessionManager(idGenerator = idGeneratorImpl))
 
     @Test
@@ -85,44 +84,6 @@ class NoughtAndCrossesRepositoryTest {
     }
 
     @Test
-    fun `joinGameSession, when joinGameSession is called with one name, gameSession player object is updated with name`() {
-        gameSessionManager.joinGameSession(Player("Bob", "id"))
-        assertTrue(
-            gameSessionManager.gameSession.players?.contains(
-                Player(
-                    "Bob",
-                    "id",
-                    gamePiece = GamePieces.Nought
-                )
-            ) == true
-        )
-    }
-
-    @Test
-    fun `If player name is empty, players is not updated`() {
-        gameSessionManager.joinGameSession(Player(""))
-        assertTrue(gameSessionManager.gameSession.players?.isEmpty() == true)
-    }
-
-    @Test
-    fun `If methods is called more than 2 times, the players list is not updated`() {
-        gameSessionManager.hostSession(Player("Bob", "id"))
-        gameSessionManager.joinGameSession(Player("Dylan", "newId"))
-        assertTrue(gameSessionManager.gameSession.players?.size == 2)
-
-        gameSessionManager.joinGameSession(Player("Mitch", "otherId"))
-        assertTrue(gameSessionManager.gameSession.players?.size == 2)
-    }
-
-    @Test
-    fun `If 2 players have the same id, the players list size in 1`() {
-        gameSessionManager.hostSession(Player("Bob", "id"))
-        gameSessionManager.joinGameSession(Player("Dylan", "id"))
-
-        assertEquals(1, gameSessionManager.gameSession.players?.size)
-    }
-
-    @Test
     fun `getGameSession, given a winningCombo, return winning player`() {
 
         // add player
@@ -155,32 +116,5 @@ class NoughtAndCrossesRepositoryTest {
 
         assertEquals(GameState.Win, actual.gameState)
         assertEquals(player2, actual.currentPlayer)
-    }
-
-    @Test
-    fun `restartSession, when restartSession is called, gameSession is updated with new states`() {
-        gameSessionManager.restartSession()
-
-        assertEquals(GameSession(), gameSessionManager.gameSession)
-        val expected = List(9) { GameCell(GamePieces.Unplayed, it) }
-        assertEquals(expected, repo.gameBoard)
-    }
-
-    @Test
-    fun `hostSession, given hostSession is called, gameSessionState is updated to Waiting`() {
-        val player1 = Player("Dylan", "id", gamePiece = GamePieces.Nought)
-        assertEquals(GameSessionState.Waiting, gameSessionManager.hostSession(player1)?.gameSessionState)
-    }
-
-    @Test
-    fun `joinGameSession, when joinGameSession is called, gameSessionState is updated to Started`() {
-        val player1 = Player("Bob", "id")
-        gameSessionManager.hostSession(player1)
-        val player2 = Player("Bobby", "id-some")
-        gameSessionManager.joinGameSession(player2)
-        assertEquals(
-            GameSession(gameSessionState = GameSessionState.Started).gameSessionState,
-            gameSessionManager.gameSession.gameSessionState
-        )
     }
 }

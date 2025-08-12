@@ -10,14 +10,16 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.testing.*
+import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class RoutingTest {
-    val sessionManage = GameSessionManager(idGenerator = TestIdGenerator())
-    val repo = NoughtAndCrossesRepository(sessionManage)
+    private val idGenerator = mock<IdGenerator>()
+    private val sessionManage = GameSessionManager(idGenerator = idGenerator)
+    private val repo = NoughtAndCrossesRepository(sessionManage)
 
     @Test
     fun `Post host returns 200 and gameSession`() = testApplication {
@@ -43,6 +45,7 @@ class RoutingTest {
             gameSessionState = GameSessionState.Waiting
         )
         repo.sessionManager.gameSession = gameSession
+        repo.sessionManager.sessions.put("session-id", gameSession)
         val client = configureServerAndGetClient(repo)
 
         val response = client.post("/joinSession") {
@@ -50,9 +53,26 @@ class RoutingTest {
             setBody(Player(name = "player2", id = "player2-id", gamePiece = Cross))
         }
         assertEquals(HttpStatusCode.OK, response.status)
-        assertEquals(GameSessionState.Started, response.body<GameSessionState>())
+        assertEquals(
+            GameSession(
+                gameSessionState = GameSessionState.Started,
+                players = listOf(
+                    Player("player1", id = "player1-id", gamePiece = Cross),
+                    Player("player2", id = "player2-id", gamePiece = Cross)
+                )
+            ), response.body<GameSession>()
+        )
     }
 
+    @Test
+    fun `loadGameState, return 200 with gameSession`() = testApplication {
+        val client = configureServerAndGetClient(repo)
+
+        val response = client.get("/loadGameState")
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertEquals(GameSession(), response.body<GameSession>())
+
+    }
     @Test
     fun `Post join returns 200 and adds a player`() = testApplication {
         val session = GameSession(
@@ -149,9 +169,5 @@ class RoutingTest {
             }
         }
         return client
-    }
-
-    class TestIdGenerator : IdGenerator {
-        override fun gameSessionId() = "testId"
     }
 }

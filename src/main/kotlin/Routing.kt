@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.model.GameSessionState
 import com.example.model.NoughtAndCrossesRepository
 import com.example.model.Player
 import io.ktor.http.*
@@ -20,7 +21,15 @@ fun Application.configureRouting(repo: NoughtAndCrossesRepository) {
         post ("/joinSession"){
             val player = call.receive<Player>()
             gameSessionManager.joinGameSession(player)
-            call.respond(HttpStatusCode.OK, gameSessionManager.gameSession.gameSessionState)
+            if (gameSessionManager.gameSession.gameSessionState == GameSessionState.Started) {
+                call.respond(HttpStatusCode.OK, gameSessionManager.gameSession)
+            } else {
+                call.respond(HttpStatusCode.NotFound, gameSessionManager.gameSession)
+            }
+        }
+
+        get("/loadGameState") {
+            call.respond(HttpStatusCode.OK, gameSessionManager.gameSession)
         }
 
         get("/gameBoard") {
@@ -44,7 +53,8 @@ fun Application.configureRouting(repo: NoughtAndCrossesRepository) {
         }
 
         get("/restartGameSession") {
-            val newGameSession = gameSessionManager.restartSession()
+            val gameSessionId = call.receive<String>()
+            val newGameSession = gameSessionManager.restartSession(gameSessionId)
             call.respond(HttpStatusCode.OK, newGameSession)
         }
     }
