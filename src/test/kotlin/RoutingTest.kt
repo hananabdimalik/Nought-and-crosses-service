@@ -68,7 +68,7 @@ class RoutingTest {
     fun `loadGameState, return 200 with gameSession`() = testApplication {
         val client = configureServerAndGetClient(repo)
 
-        val response = client.get("/loadGameState")
+        val response = client.get("/loadGameSession")
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals(GameSession(), response.body<GameSession>())
 

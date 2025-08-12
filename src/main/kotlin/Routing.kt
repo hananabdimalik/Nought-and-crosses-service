@@ -28,7 +28,7 @@ fun Application.configureRouting(repo: NoughtAndCrossesRepository) {
             }
         }
 
-        get("/loadGameState") {
+        get("/loadGameSession") {
             call.respond(HttpStatusCode.OK, gameSessionManager.gameSession)
         }
 
