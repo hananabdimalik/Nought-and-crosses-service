@@ -27,7 +27,7 @@ class GameSessionManager(
                 gameSession = gameSession.copy(gameSessionState = GameSessionState.Started)
             }
         } else {
-            gameSession = gameSession.copy(error = "Please enter a game session!")
+            gameSession = gameSession.copy(error = "Please host a game session!")
         }
     }
 
@@ -65,10 +65,4 @@ class GameSessionManager(
 
     private fun isPlayerValid(player: Player) =
         !player.name.isNullOrEmpty() && !player.id.isNullOrEmpty()
-
-    fun restartSession(gameSessionId: String): GameSession {
-        sessions.remove(gameSessionId)
-        gameSession = GameSession()
-        return gameSession
-    }
 }

@@ -36,15 +36,21 @@ fun Application.configureRouting(repo: NoughtAndCrossesRepository) {
             call.respond(HttpStatusCode.OK, repo.gameBoard)
         }
 
-        post("/updateBoard/{position}") { // request sessionId and position
+        post("/updateBoard/{position}/{sessionId}") {
             val position = call.parameters["position"]?.toIntOrNull() // if just toInt -> unhandled exception crashes the handler, and Ktor returns a 500
+            val sessionId = call.parameters["sessionId"]
+
             val player = call.receive<Player>()
             if (position != null) {
-                val updatedBoard = repo.updateGameBoard(position, player)
+                val updatedBoard = repo.updateGameBoard(position, player, sessionId)
                 call.respond(HttpStatusCode.OK, updatedBoard)
             } else {
                 call.respond(HttpStatusCode.BadRequest, "Invalid position")
             }
+        }
+
+        get("/getGameState") {
+            call.respond(HttpStatusCode.OK, repo.getGameSession())
         }
 
         get("/resetGame") {
@@ -54,8 +60,8 @@ fun Application.configureRouting(repo: NoughtAndCrossesRepository) {
 
         get("/restartGameSession") {
             val gameSessionId = call.receive<String>()
-            val newGameSession = gameSessionManager.restartSession(gameSessionId)
-            call.respond(HttpStatusCode.OK, newGameSession)
+            val newSession = repo.restartGame(gameSessionId)
+            call.respond(HttpStatusCode.OK, newSession)
         }
     }
 }

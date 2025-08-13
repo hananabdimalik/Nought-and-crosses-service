@@ -1,6 +1,7 @@
 package model
 
 import com.example.model.*
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.mockito.kotlin.mock
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -46,61 +47,28 @@ class GameSessionManagerTest {
     }
 
     @Test
-    fun `restartSession, given gameSessionId, new gameSession is created`() {
-        sut.restartSession("")
-        assertEquals(GameSession(), sut.gameSession)
+    fun `If player name is empty, players is not updated`() {
+        sut.joinGameSession(Player(""))
+        assertTrue(sut.gameSession.players?.isEmpty() == true)
     }
 
-//    @Test
-//    fun `restartSession, when restartSession is called, gameSession is updated with new states`() {
-//        sut.restartSession("")
-//
-//        assertEquals(GameSession(), sut.gameSession)
-//        val expected = List(9) { GameCell(GamePieces.Unplayed, it) }
-//        assertEquals(expected, sut.gameBoard)
-//    }
+    @Test
+    fun `If methods is called more than 2 times, the players list is not updated`() {
+        sut.hostSession(Player("Bob", "id"))
+        sut.joinGameSession(Player("Dylan", "newId"))
+        assertTrue(sut.gameSession.players?.size == 2)
 
-//    @Test
-//    fun `hostSession, given hostSession is called, gameSessionState is updated to Waiting`() {
-//        val player1 = Player("Dylan", "id", gamePiece = GamePieces.Nought)
-//        assertEquals(GameSessionState.Waiting, gameSessionManager.hostSession(player1)?.gameSessionState)
-//    }
-//
-//    @Test
-//    fun `joinGameSession, when joinGameSession is called, gameSessionState is updated to Started`() {
-//        val player1 = Player("Bob", "id")
-//        gameSessionManager.hostSession(player1)
-//        val player2 = Player("Bobby", "id-some")
-//        gameSessionManager.joinGameSession(player2)
-//        assertEquals(
-//            GameSession(gameSessionState = GameSessionState.Started).gameSessionState,
-//            gameSessionManager.gameSession.gameSessionState
-//        )
-//    }
-//
-//    @Test
-//    fun `If player name is empty, players is not updated`() {
-//        gameSessionManager.joinGameSession(Player(""))
-//        assertTrue(gameSessionManager.gameSession.players?.isEmpty() == true)
-//    }
-//
-//    @Test
-//    fun `If methods is called more than 2 times, the players list is not updated`() {
-//        gameSessionManager.hostSession(Player("Bob", "id"))
-//        gameSessionManager.joinGameSession(Player("Dylan", "newId"))
-//        assertTrue(gameSessionManager.gameSession.players?.size == 2)
-//
-//        gameSessionManager.joinGameSession(Player("Mitch", "otherId"))
-//        assertTrue(gameSessionManager.gameSession.players?.size == 2)
-//    }
-//
-//    @Test
-//    fun `If 2 players have the same id, the players list size in 1`() {
-//        gameSessionManager.hostSession(Player("Bob", "id"))
-//        gameSessionManager.joinGameSession(Player("Dylan", "id"))
-//
-//        assertEquals(1, gameSessionManager.gameSession.players?.size)
-//    }
+        sut.joinGameSession(Player("Mitch", "otherId"))
+        assertTrue(sut.gameSession.players?.size == 2)
+    }
+
+    @Test
+    fun `If 2 players have the same id, the players list size in 1`() {
+        sut.hostSession(Player("Bob", "id"))
+        sut.joinGameSession(Player("Dylan", "id"))
+
+        assertEquals(1, sut.gameSession.players?.size)
+    }
 
 }
 

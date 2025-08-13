@@ -13,8 +13,8 @@ class NoughtAndCrossesRepositoryTest {
     @Test
     fun `updateGameBoard, given a cell position, gameBoard is updated with GridCell containing a gamePiece at said position`() {
         repo.sessionManager.gameSession =
-            gameSessionManager.gameSession.copy(gameSessionState = GameSessionState.Started)
-        repo.updateGameBoard(2, Player("Bob", "Bob-Id"))
+            gameSessionManager.gameSession.copy(gameSessionState = GameSessionState.Started, sessionId = "some-sessionId")
+        repo.updateGameBoard(2, Player("Bob", "Bob-Id"), "some-sessionId")
         val expected = listOf(
             GameCell(GamePieces.Unplayed, 0),
             GameCell(GamePieces.Unplayed, 1),
@@ -32,10 +32,10 @@ class NoughtAndCrossesRepositoryTest {
     @Test
     fun `updateGameBoard, given a cell position when updateGameBoard is called twice by the same player, gameBoard is not updated the second time`() {
         repo.sessionManager.gameSession =
-            gameSessionManager.gameSession.copy(gameSessionState = GameSessionState.Started)
+            gameSessionManager.gameSession.copy(gameSessionState = GameSessionState.Started, sessionId = "some-sessionId")
 
-        repo.updateGameBoard(2, Player("Bob", "Bob-Id"))
-        repo.updateGameBoard(3, Player("Bob", "Bob-Id"))
+        repo.updateGameBoard(2, Player("Bob", "Bob-Id"), sessionId = "some-sessionId")
+        repo.updateGameBoard(3, Player("Bob", "Bob-Id"), sessionId = "some-sessionId")
         val expected = listOf(
             GameCell(GamePieces.Unplayed, 0),
             GameCell(GamePieces.Unplayed, 1),
@@ -53,10 +53,10 @@ class NoughtAndCrossesRepositoryTest {
     @Test
     fun `updateGameBoard, given a cell position when updateGameBoard is called twice by the different player, gameBoard is  updated each time`() {
         repo.sessionManager.gameSession =
-            gameSessionManager.gameSession.copy(gameSessionState = GameSessionState.Started)
+            gameSessionManager.gameSession.copy(gameSessionState = GameSessionState.Started, sessionId = "some-sessionId")
 
-        repo.updateGameBoard(2, Player("Bob", "Bob-Id"))
-        repo.updateGameBoard(3, Player("Dylan", "Dylan-Id"))
+        repo.updateGameBoard(2, Player("Bob", "Bob-Id"), sessionId = "some-sessionId")
+        repo.updateGameBoard(3, Player("Dylan", "Dylan-Id"), sessionId = "some-sessionId")
 
         val expected = listOf(
             GameCell(GamePieces.Unplayed, 0),
@@ -91,30 +91,37 @@ class NoughtAndCrossesRepositoryTest {
         val player2 = Player("Bob", "Bobs-id", gamePiece = GamePieces.Cross)
         gameSessionManager.joinGameSession(player2)
         repo.sessionManager.gameSession =
-            gameSessionManager.gameSession.copy(currentPlayer = player1, gameSessionState = GameSessionState.Started)
+            gameSessionManager.gameSession.copy(currentPlayer = player1, gameSessionState = GameSessionState.Started, sessionId = "some-sessionId")
 
         // replicate a game
-        repo.updateGameBoard(2, player1.copy(gamePiece = GamePieces.Nought))
+        repo.updateGameBoard(2, player1.copy(gamePiece = GamePieces.Nought), sessionId = "some-sessionId")
         gameSessionManager.gameSession = gameSessionManager.gameSession.copy(currentPlayer = player2)
 
-        repo.updateGameBoard(3, player2.copy(gamePiece = GamePieces.Cross))
+        repo.updateGameBoard(3, player2.copy(gamePiece = GamePieces.Cross), sessionId = "some-sessionId")
         gameSessionManager.gameSession = gameSessionManager.gameSession.copy(currentPlayer = player1)
 
-        repo.updateGameBoard(0, player1.copy(gamePiece = GamePieces.Nought))
+        repo.updateGameBoard(0, player1.copy(gamePiece = GamePieces.Nought), sessionId = "some-sessionId")
         gameSessionManager.gameSession = gameSessionManager.gameSession.copy(currentPlayer = player2)
 
-        repo.updateGameBoard(4, player2.copy(gamePiece = GamePieces.Cross))
+        repo.updateGameBoard(4, player2.copy(gamePiece = GamePieces.Cross), sessionId = "some-sessionId")
         gameSessionManager.gameSession = gameSessionManager.gameSession.copy(currentPlayer = player1)
 
-        repo.updateGameBoard(6, player1.copy(gamePiece = GamePieces.Nought))
+        repo.updateGameBoard(6, player1.copy(gamePiece = GamePieces.Nought), sessionId = "some-sessionId")
         gameSessionManager.gameSession = gameSessionManager.gameSession.copy(currentPlayer = player2)
 
-        repo.updateGameBoard(5, player2.copy(gamePiece = GamePieces.Cross))
+        repo.updateGameBoard(5, player2.copy(gamePiece = GamePieces.Cross), sessionId = "some-sessionId")
 
         // get game state
         val actual = repo.getGameSession()
 
         assertEquals(GameState.Win, actual.gameState)
         assertEquals(player2, actual.currentPlayer)
+    }
+
+    @Test
+    fun `restartGame, given gameSessionId, new gameSession is created with empty board`() {
+        repo.restartGame("sessionId")
+        assertEquals(GameSession(), repo.sessionManager.gameSession)
+        assertEquals(List(9) { GameCell(GamePieces.Unplayed, it) }, repo.gameBoard)
     }
 }

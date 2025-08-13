@@ -1,7 +1,7 @@
 package com.example.model
 
 class NoughtAndCrossesRepository(val sessionManager: GameSessionManager) {
-    private val session get() = sessionManager.gameSession // get here allows us to reference currentSession instead of storing it
+    private val session get() = sessionManager.gameSession // get here allows us to reference current session instead of storing it
     val gameBoard = MutableList(9) { GameCell(GamePieces.Unplayed, it) }
 
     private var noughtCount = 0
@@ -18,14 +18,13 @@ class NoughtAndCrossesRepository(val sessionManager: GameSessionManager) {
         2, 4, 6
     ).chunked(3)
 
-    fun updateGameBoard(position: Int, player: Player): List<GameCell> {
-        if (currentPlayer.id != player.id) {
+    fun updateGameBoard(position: Int, player: Player, sessionId: String?): List<GameCell> {
+        if (currentPlayer.id != player.id && sessionManager.gameSession.sessionId == sessionId) {
             currentPlayer = player
             if (session.gameSessionState == GameSessionState.Started && position in 0 until gameBoard.size) {
                 gameBoard[position] = gameBoard[position].copy(alternativeGamePiece(), position)
             }
         }
-
         return gameBoard
     }
 
@@ -63,7 +62,7 @@ class NoughtAndCrossesRepository(val sessionManager: GameSessionManager) {
 
     fun resetGame(): List<GameCell> {
         sessionManager.gameSession =
-            session.copy(gameSessionState = GameSessionState.Ended, gameState = GameState.None)
+            session.copy(gameState = GameState.None)
         currentPlayer = Player()
         noughtCount = 0
         crossCount = 0
@@ -89,5 +88,14 @@ class NoughtAndCrossesRepository(val sessionManager: GameSessionManager) {
 
             else -> GamePieces.Unplayed
         }
+    }
+
+    fun restartGame(gameSessionId: String): RestartGame {
+        gameBoard.forEachIndexed { index, _ ->
+            gameBoard[index] = gameBoard[index].copy(GamePieces.Unplayed, index)
+        }
+        sessionManager.sessions.remove(gameSessionId)
+        sessionManager.gameSession = GameSession()
+        return RestartGame(sessionManager.gameSession, gameBoard)
     }
 }

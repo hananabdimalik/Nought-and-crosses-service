@@ -34,3 +34,6 @@ data class Player(
 enum class GameSessionState {
     Waiting, Started, Ended
 }
+
+@Serializable
+data class RestartGame(val gameSession: GameSession, val gameBoard: List<GameCell>)
