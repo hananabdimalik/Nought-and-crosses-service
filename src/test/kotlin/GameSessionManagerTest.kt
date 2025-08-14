@@ -1,7 +1,10 @@
-package model
-
-import com.example.model.*
-import org.junit.jupiter.api.Assertions.assertTrue
+import com.example.GameSessionManager
+import com.example.model.GamePieces
+import com.example.model.GameSession
+import com.example.model.GameSessionState
+import com.example.model.Player
+import com.example.utils.IdGenerator
+import org.junit.jupiter.api.Assertions
 import org.mockito.kotlin.mock
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -49,17 +52,17 @@ class GameSessionManagerTest {
     @Test
     fun `If player name is empty, players is not updated`() {
         sut.joinGameSession(Player(""))
-        assertTrue(sut.gameSession.players?.isEmpty() == true)
+        Assertions.assertTrue(sut.gameSession.players?.isEmpty() == true)
     }
 
     @Test
     fun `If methods is called more than 2 times, the players list is not updated`() {
         sut.hostSession(Player("Bob", "id"))
         sut.joinGameSession(Player("Dylan", "newId"))
-        assertTrue(sut.gameSession.players?.size == 2)
+        Assertions.assertTrue(sut.gameSession.players?.size == 2)
 
         sut.joinGameSession(Player("Mitch", "otherId"))
-        assertTrue(sut.gameSession.players?.size == 2)
+        Assertions.assertTrue(sut.gameSession.players?.size == 2)
     }
 
     @Test
@@ -71,4 +74,3 @@ class GameSessionManagerTest {
     }
 
 }
-

@@ -1,4 +1,10 @@
-package com.example.model
+package com.example
+
+import com.example.model.GamePieces
+import com.example.model.GameSession
+import com.example.model.GameSessionState
+import com.example.model.Player
+import com.example.utils.IdGenerator
 
 class GameSessionManager(
     val idGenerator: IdGenerator

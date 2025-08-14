@@ -1,4 +1,13 @@
-package com.example.model
+package com.example.repository
+
+import com.example.model.GameCell
+import com.example.model.GamePieces
+import com.example.model.GameSession
+import com.example.GameSessionManager
+import com.example.model.GameSessionState
+import com.example.model.GameState
+import com.example.model.Player
+import com.example.model.RestartGame
 
 class NoughtAndCrossesRepository(val sessionManager: GameSessionManager) {
     private val session get() = sessionManager.gameSession // get here allows us to reference current session instead of storing it

@@ -1,13 +1,21 @@
-package model
+package repository
 
-import com.example.model.*
+import com.example.model.GameCell
+import com.example.model.GamePieces
+import com.example.model.GameSession
+import com.example.GameSessionManager
+import com.example.model.GameSessionState
+import com.example.model.GameState
+import com.example.utils.IdGeneratorImpl
+import com.example.model.Player
+import com.example.repository.NoughtAndCrossesRepository
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class NoughtAndCrossesRepositoryTest {
 
     private val idGeneratorImpl = IdGeneratorImpl()
-    private val gameSessionManager = GameSessionManager( idGenerator = idGeneratorImpl)
+    private val gameSessionManager = GameSessionManager(idGenerator = idGeneratorImpl)
     private val repo = NoughtAndCrossesRepository(GameSessionManager(idGenerator = idGeneratorImpl))
 
     @Test

@@ -1,8 +1,8 @@
 package com.example
 
-import com.example.model.GameSessionManager
-import com.example.model.IdGeneratorImpl
-import com.example.model.NoughtAndCrossesRepository
+import com.example.GameSessionManager
+import com.example.utils.IdGeneratorImpl
+import com.example.repository.NoughtAndCrossesRepository
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {

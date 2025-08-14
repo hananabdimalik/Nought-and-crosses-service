@@ -1,7 +1,7 @@
 package com.example
 
 import com.example.model.GameSessionState
-import com.example.model.NoughtAndCrossesRepository
+import com.example.repository.NoughtAndCrossesRepository
 import com.example.model.Player
 import io.ktor.http.*
 import io.ktor.server.application.*

@@ -1,6 +1,6 @@
-package model
+package utils
 
-import com.example.model.IdGenerator
+import com.example.utils.IdGenerator
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
